@@ -1,0 +1,509 @@
+<div id="kapslownik-root"></div>
+<style>
+  #kapslownik-root {
+    --bg: #14171a;
+    --panel: #1c2024;
+    --panel-2: #22262b;
+    --line: #2f3439;
+    --copper: #b8763f;
+    --copper-dark: #7a4d29;
+    --brass-light: #e8b169;
+    --text: #eee7d8;
+    --muted: #8d9298;
+    --ok: #7fae7f;
+    --bad: #c05a45;
+
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    padding: 28px 20px 60px;
+    border-radius: 14px;
+    min-height: 100%;
+    box-sizing: border-box;
+  }
+  #kapslownik-root * { box-sizing: border-box; }
+
+  @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap');
+
+  .kp-wrap { max-width: 980px; margin: 0 auto; }
+
+  .kp-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    flex-wrap: wrap;
+    margin-bottom: 28px;
+  }
+  .kp-title-block .eyebrow {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    color: var(--copper);
+    text-transform: uppercase;
+    margin: 0 0 4px;
+  }
+  .kp-title-block h1 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 44px;
+    letter-spacing: 0.03em;
+    margin: 0;
+    line-height: 1;
+    color: var(--text);
+  }
+  .kp-title-block p {
+    margin: 8px 0 0;
+    color: var(--muted);
+    font-size: 13.5px;
+    max-width: 380px;
+  }
+
+  /* --- crimped bottle-cap badge (signature element) --- */
+  .cap-badge-holder { position: relative; width: 148px; height: 148px; flex-shrink: 0; }
+  .cap-outer {
+    position: absolute; inset: 0;
+    background: repeating-conic-gradient(var(--copper) 0deg 8deg, var(--copper-dark) 8deg 16deg);
+  }
+  .cap-inner {
+    position: absolute; inset: 12px; border-radius: 50%;
+    background: radial-gradient(circle at 32% 28%, var(--brass-light), var(--copper) 65%, var(--copper-dark) 100%);
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    box-shadow: inset 0 2px 6px rgba(0,0,0,.35), inset 0 -3px 8px rgba(0,0,0,.25);
+  }
+  .cap-inner .num {
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 700;
+    font-size: 26px;
+    color: #201205;
+    line-height: 1;
+  }
+  .cap-inner .lbl {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #3a230f;
+    margin-top: 4px;
+  }
+
+  .kp-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px;
+  }
+  @media (max-width: 720px) {
+    .kp-grid { grid-template-columns: 1fr; }
+  }
+
+  .kp-panel {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 18px 18px 20px;
+  }
+  .kp-panel h2 {
+    font-family: 'Bebas Neue', sans-serif;
+    letter-spacing: 0.04em;
+    font-size: 20px;
+    margin: 0 0 4px;
+    color: var(--brass-light);
+  }
+  .kp-panel .sub {
+    color: var(--muted);
+    font-size: 12px;
+    margin: 0 0 14px;
+  }
+
+  .kp-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 0;
+    border-bottom: 1px solid var(--line);
+  }
+  .kp-row:last-child { border-bottom: none; }
+  .kp-row .name { flex: 1; font-size: 13.5px; font-weight: 500; }
+  .kp-row .val {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11.5px;
+    color: var(--copper);
+    background: rgba(184,118,63,0.12);
+    border: 1px solid rgba(184,118,63,0.3);
+    padding: 2px 6px;
+    border-radius: 4px;
+    min-width: 62px;
+    text-align: center;
+  }
+
+  .stepper { display: flex; align-items: center; gap: 6px; }
+  .stepper button {
+    width: 26px; height: 26px;
+    border-radius: 6px;
+    border: 1px solid var(--line);
+    background: var(--panel-2);
+    color: var(--text);
+    font-size: 15px;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    line-height: 1;
+    transition: background .15s, border-color .15s;
+  }
+  .stepper button:hover { background: #2a2f34; border-color: var(--copper); }
+  .stepper input {
+    width: 48px;
+    text-align: center;
+    background: var(--panel-2);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    color: var(--text);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    padding: 5px 2px;
+  }
+  .stepper input:focus { outline: none; border-color: var(--copper); }
+
+  .kp-subtotal {
+    margin-top: 12px;
+    padding-top: 10px;
+    border-top: 1px dashed var(--line);
+    display: flex;
+    justify-content: space-between;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12.5px;
+    color: var(--muted);
+  }
+  .kp-subtotal b { color: var(--brass-light); }
+
+  .loose-box {
+    margin-top: 14px;
+    background: var(--panel-2);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 10px 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+  }
+  .loose-box .name { font-size: 13px; color: var(--text); }
+  .loose-box .name small { display:block; color: var(--muted); font-size: 11px; margin-top: 2px; }
+
+  .shop-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 8px;
+    border-radius: 7px;
+    border: 1px solid transparent;
+    cursor: pointer;
+    transition: background .15s, border-color .15s;
+  }
+  .shop-item:hover { background: rgba(184,118,63,0.08); }
+  .shop-item.active {
+    background: rgba(184,118,63,0.14);
+    border-color: var(--copper);
+  }
+  .shop-item .name { flex: 1; font-size: 13.5px; }
+  .shop-item .price {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--muted);
+  }
+  .shop-item.active .price { color: var(--brass-light); }
+  .shop-item .dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    border: 1.5px solid var(--muted);
+    flex-shrink: 0;
+  }
+  .shop-item.active .dot { background: var(--copper); border-color: var(--copper); }
+
+  .target-panel {
+    margin-top: 18px;
+    background: linear-gradient(160deg, rgba(184,118,63,0.10), rgba(184,118,63,0.02));
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 16px;
+  }
+  .target-panel .eyebrow {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10.5px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--copper);
+    margin: 0 0 6px;
+  }
+  .target-panel h3 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 24px;
+    letter-spacing: 0.02em;
+    margin: 0 0 10px;
+  }
+  .bar-track {
+    height: 10px;
+    border-radius: 6px;
+    background: var(--panel-2);
+    overflow: hidden;
+    border: 1px solid var(--line);
+  }
+  .bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--copper), var(--brass-light));
+    transition: width .25s ease;
+  }
+  .target-stats {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 8px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12.5px;
+    color: var(--muted);
+  }
+  .target-stats b { color: var(--text); }
+  .missing-line {
+    margin-top: 12px;
+    font-size: 13px;
+  }
+  .missing-line.ok { color: var(--ok); }
+  .missing-line.bad { color: var(--bad); }
+
+  .suggest-table {
+    margin-top: 12px;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    row-gap: 4px;
+    column-gap: 10px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+  }
+  .suggest-table .k { color: var(--muted); }
+  .suggest-table .v { color: var(--brass-light); text-align: right; }
+
+  .kp-reset {
+    display: block;
+    margin: 22px auto 0;
+    background: none;
+    border: 1px solid var(--line);
+    color: var(--muted);
+    font-size: 11.5px;
+    padding: 7px 14px;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: border-color .15s, color .15s;
+  }
+  .kp-reset:hover { border-color: var(--bad); color: var(--bad); }
+</style>
+
+<script>
+(function () {
+  const WEAPONS = [
+    { id: 'pistolet', name: 'Pistolet', value: 9 },
+    { id: 'sns', name: 'SNS Pistolet', value: 9 },
+    { id: 'mk2', name: 'Pistolet MK2', value: 12 },
+    { id: 'vintage', name: 'Pistolet Vintage', value: 20 },
+    { id: 'sns_mk2', name: 'SNS Pistolet MK2', value: 20 },
+    { id: 'ceramiczny', name: 'Pistolet Ceramiczny', value: 23 },
+  ];
+
+  const SHOP = [
+    { id: 'tlumik', name: 'Tłumik', cost: 60 },
+    { id: 'magazynek', name: 'Pow. Magazynek', cost: 60 },
+    { id: 'kluczyk', name: 'Kluczyk', cost: 50 },
+    { id: 'laski', name: 'Karta Laski', cost: 160 },
+    { id: 'przeprania', name: 'Karta Przepalenia 75%', cost: 180 },
+    { id: 'przyslugi', name: 'Karta Przysługi', cost: 180 },
+    { id: 'diabla', name: 'Karta Diabła', cost: 525 },
+    { id: 'unjail', name: 'Karta Unjail', cost: 550 },
+  ];
+
+  const STORAGE_KEY = 'kapslownik-state-v1';
+  const root = document.getElementById('kapslownik-root');
+
+  let state = {
+    weapons: Object.fromEntries(WEAPONS.map(w => [w.id, 0])),
+    loose: 0,
+    target: SHOP[0].id,
+  };
+
+  function clamp0(n) { return Math.max(0, Math.floor(Number(n) || 0)); }
+
+  function weaponTotal() {
+    return WEAPONS.reduce((sum, w) => sum + state.weapons[w.id] * w.value, 0);
+  }
+  function total() {
+    return weaponTotal() + clamp0(state.loose);
+  }
+
+  async function save() {
+    try {
+      await window.storage.set(STORAGE_KEY, JSON.stringify(state), false);
+    } catch (e) { console.error('Nie udało się zapisać stanu', e); }
+  }
+
+  async function load() {
+    try {
+      const res = await window.storage.get(STORAGE_KEY, false);
+      if (res && res.value) {
+        const parsed = JSON.parse(res.value);
+        state = {
+          weapons: { ...state.weapons, ...(parsed.weapons || {}) },
+          loose: clamp0(parsed.loose),
+          target: parsed.target || SHOP[0].id,
+        };
+      }
+    } catch (e) {
+      // brak zapisanych danych — start od zera
+    }
+  }
+
+  // crimped bottle-cap clip-path, generated once
+  function capClipPath(teeth) {
+    const pts = [];
+    const outerR = 50, innerR = 44;
+    const step = 360 / (teeth * 2);
+    for (let i = 0; i < teeth * 2; i++) {
+      const angle = (i * step) * Math.PI / 180;
+      const r = i % 2 === 0 ? outerR : innerR;
+      const x = 50 + r * Math.sin(angle);
+      const y = 50 - r * Math.cos(angle);
+      pts.push(`${x.toFixed(2)}% ${y.toFixed(2)}%`);
+    }
+    return `polygon(${pts.join(',')})`;
+  }
+
+  function render() {
+    const tgt = SHOP.find(s => s.id === state.target) || SHOP[0];
+    const owned = total();
+    const missing = tgt.cost - owned;
+    const pct = Math.min(100, Math.round((owned / tgt.cost) * 100));
+
+    root.innerHTML = `
+      <div class="kp-wrap">
+        <div class="kp-header">
+          <div class="kp-title-block">
+            <p class="eyebrow">Skup broni · Sklep za kapsle</p>
+            <h1>KAPSLOWNIK</h1>
+            <p>Dodaj broń, którą oddajesz, wrzuć luźne kapsle i sprawdź, ile brakuje Ci do wymarzonego przedmiotu.</p>
+          </div>
+          <div class="cap-badge-holder">
+            <div class="cap-outer" id="capOuter"></div>
+            <div class="cap-inner">
+              <div class="num">${owned}</div>
+              <div class="lbl">kapsli</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="kp-grid">
+          <div class="kp-panel">
+            <h2>Broń na kapsle</h2>
+            <p class="sub">Wpisz albo dodaj plusikiem ile sztuk oddajesz</p>
+            ${WEAPONS.map(w => `
+              <div class="kp-row">
+                <span class="name">${w.name}</span>
+                <span class="val">${w.value} / szt.</span>
+                <div class="stepper">
+                  <button data-action="dec" data-id="${w.id}">−</button>
+                  <input type="number" min="0" step="1" data-id="${w.id}" value="${state.weapons[w.id]}" />
+                  <button data-action="inc" data-id="${w.id}">+</button>
+                </div>
+              </div>
+            `).join('')}
+
+            <div class="loose-box">
+              <div class="name">Luźne kapsle<small>doliczane wprost, bez mnożnika</small></div>
+              <div class="stepper">
+                <button data-action="dec-loose">−</button>
+                <input type="number" min="0" step="1" id="looseInput" value="${state.loose}" />
+                <button data-action="inc-loose">+</button>
+              </div>
+            </div>
+
+            <div class="kp-subtotal">
+              <span>Z broni: <b>${weaponTotal()}</b> + luźne: <b>${clamp0(state.loose)}</b></span>
+              <span>Razem: <b>${owned}</b></span>
+            </div>
+          </div>
+
+          <div class="kp-panel">
+            <h2>Sklep za kapsle</h2>
+            <p class="sub">Wybierz przedmiot, żeby zobaczyć ile jeszcze brakuje</p>
+            ${SHOP.map(s => `
+              <div class="shop-item ${s.id === tgt.id ? 'active' : ''}" data-target="${s.id}">
+                <span class="dot"></span>
+                <span class="name">${s.name}</span>
+                <span class="price">${s.cost} kapsli</span>
+              </div>
+            `).join('')}
+
+            <div class="target-panel">
+              <p class="eyebrow">Cel</p>
+              <h3>${tgt.name} — ${tgt.cost} kapsli</h3>
+              <div class="bar-track"><div class="bar-fill" style="width:${pct}%"></div></div>
+              <div class="target-stats">
+                <span>Masz: <b>${owned}</b></span>
+                <span>${pct}%</span>
+              </div>
+              ${missing > 0
+                ? `<p class="missing-line bad">Brakuje Ci jeszcze <b>${missing}</b> kapsli.</p>
+                   <div class="suggest-table">
+                     ${WEAPONS.map(w => `
+                       <div class="k">${w.name} (${w.value}/szt.)</div>
+                       <div class="v">${Math.ceil(missing / w.value)} szt.</div>
+                     `).join('')}
+                   </div>`
+                : `<p class="missing-line ok">Masz wystarczająco! Zostanie Ci ${Math.abs(missing)} kapsli nadwyżki.</p>`
+              }
+            </div>
+          </div>
+        </div>
+
+        <button class="kp-reset" id="resetBtn">Wyzeruj wszystko</button>
+      </div>
+    `;
+
+    document.getElementById('capOuter').style.clipPath = capClipPath(21);
+
+    root.querySelectorAll('.stepper input[data-id]').forEach(inp => {
+      inp.addEventListener('change', e => {
+        state.weapons[e.target.dataset.id] = clamp0(e.target.value);
+        save(); render();
+      });
+    });
+    root.querySelectorAll('button[data-action="inc"], button[data-action="dec"]').forEach(btn => {
+      btn.addEventListener('click', e => {
+        const id = e.target.dataset.id;
+        const delta = e.target.dataset.action === 'inc' ? 1 : -1;
+        state.weapons[id] = clamp0(state.weapons[id] + delta);
+        save(); render();
+      });
+    });
+
+    document.getElementById('looseInput').addEventListener('change', e => {
+      state.loose = clamp0(e.target.value);
+      save(); render();
+    });
+    root.querySelector('[data-action="inc-loose"]').addEventListener('click', () => {
+      state.loose = clamp0(state.loose + 1); save(); render();
+    });
+    root.querySelector('[data-action="dec-loose"]').addEventListener('click', () => {
+      state.loose = clamp0(state.loose - 1); save(); render();
+    });
+
+    root.querySelectorAll('.shop-item').forEach(el => {
+      el.addEventListener('click', () => {
+        state.target = el.dataset.target;
+        save(); render();
+      });
+    });
+
+    document.getElementById('resetBtn').addEventListener('click', () => {
+      if (!confirm('Na pewno wyzerować wszystkie liczniki?')) return;
+      state.weapons = Object.fromEntries(WEAPONS.map(w => [w.id, 0]));
+      state.loose = 0;
+      save(); render();
+    });
+  }
+
+  load().then(render);
+})();
+</script>
